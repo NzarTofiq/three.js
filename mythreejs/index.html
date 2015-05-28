@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<script src="../build/three.min.js"></script>
+	<title>Three js experiment</title>
+</head>
+<body>
+	<div id="container"></div>
+</body>
+<script>
+
+//**************CREATE A CAM MOVEMENT WITH MOUSEDOWN******************\\
+
+// scene size
+var WIDTH = 400;
+var HEIGHT = 300;
+
+// camera attributes
+var VIEW_ANGLE = 45;
+var ASPECT = WIDTH / HEIGHT;
+var NEAR = 0.1;
+var FAR = 2000;
+
+// get the DOM element to attach to
+// - assume we've got jQuery to hand
+var container = document.getElementById('container');
+
+// create a WebGL renderer, camera
+// and a scene
+var renderer = new THREE.WebGLRenderer();
+var camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+
+var scene = new THREE.Scene();
+
+// add the camera to the scene
+scene.add(camera);
+
+// the camera starts at 0,0,0
+// so pull it back
+camera.position.z = 500;
+camera.position.y = window.innerHeight/200;
+
+// start the renderer
+renderer.setSize(window.innerHeight / 0.8, window.innerHeight);
+
+// attach the render-supplied DOM element
+container.appendChild(renderer.domElement);
+
+var radius = 50;
+var segments = 10;
+var rings = 50;
+
+var cubeLength = 30;
+
+var geometry = new THREE.BoxGeometry( cubeLength, cubeLength, cubeLength );
+var material = new THREE.MeshLambertMaterial( {color: 0x5BD3FF} );
+var cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+
+// create the sphere's material
+var sphereMaterial = new THREE.MeshLambertMaterial({ color: 0x5FD0F0 });
+
+var sphere = 
+new THREE.Mesh(
+		new THREE.SphereGeometry(
+			radius,
+			segments,
+			rings),
+		sphereMaterial
+	);
+scene.add(sphere);
+
+//create a point light
+var pointLight = new THREE.PointLight(0xFFFFFF);
+pointLight.position.x = 10;
+pointLight.position.y = 50;
+pointLight.position.z = 130;
+
+var pointLight2 = new THREE.PointLight(0xFFFFFF);
+pointLight2.position.x = 0;
+pointLight2.position.y = 0;
+pointLight2.position.z = 200;
+scene.add(pointLight2);
+
+// add to the scene
+scene.add(pointLight);
+cube.position.set(100, 10,10);
+
+container.addEventListener('click', function(e){
+	camera.position.x = 50 - e.clientX / 10;
+	camera.position.y = 50 - e.clientY / 10;
+
+	console.log(camera.position.x, camera.position.y);
+})
+
+function animloop(){
+	window.requestAnimationFrame(animloop);
+	camera.rotation.z += 0.1;
+	//cube.rotation.z -= 0.00001;
+	//sphere.rotation -= 0.01;
+	//cube.position.y = camera.rotation.z / (radius * cubeLength);
+
+	if(cube.position.y > 300){
+		cube.position.y = 10;
+	}
+	// draw!
+	renderer.render(scene, camera);
+};
+
+animloop();
+
+</script>
+</html>
